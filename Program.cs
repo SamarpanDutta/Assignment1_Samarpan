@@ -45,7 +45,7 @@ namespace Assignment1_Samarpan
 
             //Question 5:
             List<string> emails = new List<string>();
-            emails.Add("dis.email + bull@usf.com");
+            emails.Add("dis.email+bull@usf.com");
             emails.Add("dis.e.mail+bob.cathy@usf.com");
             emails.Add("disemail+david@us.f.com");
             int ans5 = UniqueEmails(emails);
