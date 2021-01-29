@@ -247,15 +247,15 @@ namespace Assignment1_Samarpan
         /// <param name="nums"></param>
         /// <param name="k"></param>
         /// <returns>Number of pairs in the array with the given number as difference</returns>
-        
-        /* Approach:
-            add one by one element to the hashset.
-            if we assume |a-b|=k then either a-k or a+k or both should contribute to the final count.
-            But this approach will not work for k=0
-            This needs to be considered as separate corner case, where every element having more than one 
-            occurence will contribute to the count
+
+        /* 
+         * General Approach:
+         * add one by one element to the List while simultaneously checking for duplication.
+         * if we assume |a-b|=k then either a-k or a+k or both should contribute to the final count.
+         * But this approach will not work for k=0
+         * This needs to be considered as separate corner case, where every element having more than one 
+         * occurence will contribute to the count 
          */
-        
         private static int diffPairs(int[] nums, int k)
         {
             try
@@ -267,7 +267,7 @@ namespace Assignment1_Samarpan
                 {
                     return 0;
                 }
-                HashSet<int> a = new HashSet<int>();
+                List<int> a = new List<int>();
                 Array.Sort(nums);
 
                 // corner case when k=0;
@@ -300,7 +300,11 @@ namespace Assignment1_Samarpan
                 a.Add(nums[0]);
                 for (int i = 1; i < nums.Length; i++)
                 {
-                    a.Add(nums[i]);
+                    // checking for duplication while inserting
+                    if (!a.Contains(nums[i]))
+                    {
+                        a.Add(nums[i]);
+                    }
                     if (i > 0 && nums[i] == nums[i - 1])
                     {
                         continue;
@@ -326,6 +330,84 @@ namespace Assignment1_Samarpan
             }
         }
 
+        /* Approach:
+            add one by one element to the hashset.
+            if we assume |a-b|=k then either a-k or a+k or both should contribute to the final count.
+            But this approach will not work for k=0
+            This needs to be considered as separate corner case, where every element having more than one 
+            occurence will contribute to the count
+         */
+
+        //private static int diffPairs(int[] nums, int k)
+        //{
+        //    try
+        //    {
+        //        int count = 0;
+
+        //        // corner case when there is only one or no element in the array
+        //        if (nums.Length <= 1)
+        //        {
+        //            return 0;
+        //        }
+        //        HashSet<int> a = new HashSet<int>();
+        //        Array.Sort(nums);
+
+        //        // corner case when k=0;
+        //        if (k == 0)
+        //        {
+        //            int nocc = 1;
+        //            for (int i = 1; i < nums.Length; i++)
+        //            {
+        //                if (nums[i - 1] != nums[i])
+        //                {
+        //                    if (nocc > 1)
+        //                    {
+        //                        count += 1;
+        //                    }
+        //                    nocc = 1;
+        //                }
+        //                else
+        //                {
+        //                    nocc++;
+        //                }
+        //            }
+        //            if (nocc > 1)
+        //            {
+        //                count += 1;
+        //            }
+        //            return count;
+        //        }
+
+        //        // regular case to detect determine count
+        //        a.Add(nums[0]);
+        //        for (int i = 1; i < nums.Length; i++)
+        //        {
+        //            a.Add(nums[i]);
+        //            if (i > 0 && nums[i] == nums[i - 1])
+        //            {
+        //                continue;
+        //            }
+        //            // if b+k is there in the hashset
+        //            if (a.Contains(nums[i] + k))
+        //            {
+        //                count++;
+        //            }
+
+        //            // if b-k is there in the hashset 
+        //            if (a.Contains(nums[i] - k))
+        //            {
+        //                count++;
+        //            }
+        //        }
+        //        return count;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("An error occured: " + e.Message);
+        //        throw;
+        //    }
+        //}
+
         /// <summary>
         /// An Email has two parts, local name and domain name. 
         /// Eg: rocky @usf.edu – local name : rocky, domain name : usf.edu
@@ -339,19 +421,20 @@ namespace Assignment1_Samarpan
         /// Input: ["dis.email+bull@usf.com","dis.e.mail+bob.cathy@usf.com","disemail+david@us.f.com"]
         /// Output: 2
         /// Explanation: "disemail@usf.com" and "disemail@us.f.com" actually receive mails
-        /// </summary>
-        /// <param name="emails"></param>
-        /// <returns>The number of unique emails in the given list</returns>
-        
-        /* We will manipulate the string based on the formula specified in the problem and add it to the hashset
-           so that possible duplications can be eliminated.
+        /// 
+
+        /* Ordinary approach:
+         * Manipulate the string based on the formula specified and then add it to a list.
+         * While adding check whether the element is already there is the list. 
+         * If yes then do not add it to prevent duplication
+         * return the length of the list
          */
 
         private static int UniqueEmails(List<string> emails)
         {
             try
             {
-                HashSet<string> r = new HashSet<string>();
+                List<string> r = new List<string>();
                 foreach (string email in emails)
                 {
                     // split in local name and domain name
@@ -363,8 +446,12 @@ namespace Assignment1_Samarpan
                     // replace all the dots(.) of lnamedot with empty string
                     string lname = lnamedot.Replace(".", "");
 
-                    // insert the element to the hashset. duplication problem is taken care of.
-                    r.Add(lname + '@' + m[1]);
+                    // insert the element to the hashset. while inserting check for duplication.
+                    string f = lname + "@" + m[1];
+                    if (!r.Contains(f))
+                    {
+                        r.Add(f);
+                    }
                 }
                 // the count of total number of elements must be returned as desired output
                 return r.Count;
@@ -376,13 +463,57 @@ namespace Assignment1_Samarpan
             }
         }
 
+
+        /* Efficient approach:
+         * We will manipulate the string based on the formula specified in the problem and add it to the hashset
+         * so that possible duplications can be eliminated.
+         */
+
+        //private static int UniqueEmails(List<string> emails)
+        //{
+        //    try
+        //    {
+        //        HashSet<string> r = new HashSet<string>();
+        //        foreach (string email in emails)
+        //        {
+        //            // split in local name and domain name
+        //            string[] m = email.Split('@');
+
+        //            // In the local name section fetch the first substring before the first occurence of '+' 
+        //            string lnamedot = (m[0].Split('+'))[0];
+
+        //            // replace all the dots(.) of lnamedot with empty string
+        //            string lname = lnamedot.Replace(".", "");
+
+        //            // insert the element to the hashset. duplication problem is taken care of.
+        //            r.Add(lname + '@' + m[1]);
+        //        }
+        //        // the count of total number of elements must be returned as desired output
+        //        return r.Count;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e.Message);
+        //        throw;
+        //    }
+        //}
+
         /// <summary>
-        /// You are given the array paths, where paths[i] = [cityAi, cityBi] means there exists a direct path going from cityAi to cityBi. Return the destination city, that is, the city without any path outgoing to another city.
-        /// It is guaranteed that the graph of paths forms a line without any loop, therefore, there will be exactly one destination city.
+        /// You are given the array paths, where paths[i] = [cityAi, cityBi] means there exists 
+        /// a direct path going from cityAi to cityBi. Return the destination city, 
+        /// that is, the city without any path outgoing to another city.
+        /// It is guaranteed that the graph of paths forms a line without any loop, 
+        /// therefore, there will be exactly one destination city.
+        /// 
         /// Example 1:
+        /// 
         /// Input: paths = [["London", "New York"], ["New York","Tampa"], ["Delhi","London"]]
         /// Output: "Tampa" 
-        /// Explanation: Starting at "Delhi" city you will reach "Tampa" city which is the destination city.Your trip consist of: "Delhi" -> "London" -> "New York" -> "Tampa".
+        /// Explanation: Starting at "Delhi" city you will reach "Tampa" city which is the destination city.
+        /// Your trip consist of: "Delhi" -> "London" -> "New York" -> "Tampa".
+        /// 
+        /// Example 2:
+        /// 
         /// Input: paths = [["B","C"],["D","B"],["C","A"]]
         /// Output: "A"
         /// Explanation: All possible trips are: 
@@ -391,45 +522,39 @@ namespace Assignment1_Samarpan
         /// "C" -> "A". 
         /// "A". 
         /// Clearly the destination city is "A".
-        /// </summary>
-        /// <param name="paths"></param>
-        /// <returns>The destination city string</returns>
-        
-        /* Approach:
-         * Build two hashset, one for source and another for destination
-         * add the values in the hashset. 
-         * duplication problem will be taken care of.
-         * find the city which is there in destination but not in source.
+        /// 
+
+        /* General approach
+         * Create two array, one having all the source cities and another having all the detination cities
+         * find the city which is there in destination but not in source
          */
 
         private static string DestCity(string[,] paths)
         {
             try
             {
-                HashSet<string> source = new HashSet<string>();
-                HashSet<string> destination = new HashSet<string>();
-                String result = "";
                 int r = paths.GetLength(0);
-                int c = paths.GetLength(1);
+                string result = "";
+                // create two array, one for all the source cities and another for all the destination cities
+                string[] source = new string[r];
+                string[] dest = new string[r];
 
-                // inserting the values in the appropriate hashset
+                // populating source and destination arrays with appropriate values
                 for(int i = 0; i < r; i++)
                 {
-                    source.Add(paths[i, 0]);
-                    destination.Add(paths[i, 1]);
+                    source[i] = paths[i, 0];
+                    dest[i] = paths[i, 1];
                 }
 
-                // finding the city which is there in destination but not in source.
-                foreach (string city in destination)
+                // find the city which is there in the destination array but not in the source array
+                for (int i = 0; i < r; i++)
                 {
-                    if (!source.Contains(city))
+                    if (!IsThereInSource(dest[i], source))
                     {
-                        result = city;
+                        result = dest[i];
                         break;
                     }
                 }
-
-                // returning the result back to the caller
                 return result;
             }
             catch (Exception)
@@ -437,5 +562,61 @@ namespace Assignment1_Samarpan
                 throw;
             }
         }
+
+        // simple linear search to look up if a particular city is there in the source array.
+        private static bool IsThereInSource(string city, string[] source)
+        {
+            for(int i = 0; i < source.Length; i++)
+            {
+                if (source[i] == city)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /* Time Optimized Approach:
+         * Build two hashset, one for source and another for destination
+         * add the values in the hashset. 
+         * duplication problem will be taken care of.
+         * find the city which is there in destination but not in source.
+         */
+
+        //private static string DestCity(string[,] paths)
+        //{
+        //    try
+        //    {
+        //        HashSet<string> source = new HashSet<string>();
+        //        HashSet<string> destination = new HashSet<string>();
+        //        String result = "";
+        //        int r = paths.GetLength(0);
+        //        int c = paths.GetLength(1);
+
+        //        // inserting the values in the appropriate hashset
+        //        for(int i = 0; i < r; i++)
+        //        {
+        //            source.Add(paths[i, 0]);
+        //            destination.Add(paths[i, 1]);
+        //        }
+
+        //        // finding the city which is there in destination but not in source.
+        //        foreach (string city in destination)
+        //        {
+        //            if (!source.Contains(city))
+        //            {
+        //                result = city;
+        //                break;
+        //            }
+        //        }
+
+        //        // returning the result back to the caller
+        //        return result;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
     }
 }
